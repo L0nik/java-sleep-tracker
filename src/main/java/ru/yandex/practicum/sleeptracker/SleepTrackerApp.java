@@ -25,6 +25,10 @@ public class SleepTrackerApp {
         loadSleepLog(path);
 
         functions.add(SleepTrackerApp::test);
+
+        functions.stream()
+                .map(function -> function.apply(sleepLog))
+                .toList().forEach(System.out::println);
     }
 
     private static void loadSleepLog(String path) {
