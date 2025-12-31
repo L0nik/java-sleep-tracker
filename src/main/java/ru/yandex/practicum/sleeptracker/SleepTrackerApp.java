@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 public class SleepTrackerApp {
 
@@ -24,7 +23,11 @@ public class SleepTrackerApp {
         String path = args[0];
         loadSleepLog(path);
 
-        functions.add(SleepTrackerApp::test);
+        functions.add(AnalyticalFunctions::countSessions);
+        functions.add(AnalyticalFunctions::findMinSession);
+        functions.add(AnalyticalFunctions::findMaxSession);
+        functions.add(AnalyticalFunctions::findAverageSession);
+        functions.add(AnalyticalFunctions::countBadSleepSessions);
 
         functions.stream()
                 .map(function -> function.apply(sleepLog))
@@ -48,9 +51,5 @@ public class SleepTrackerApp {
         } catch (IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }
-    }
-
-    private static SleepAnalysisResult<String> test(ArrayList<SleepingSession> sleepLog) {
-        return new SleepAnalysisResult<String>("тестовое описание", "тестовый результат");
     }
 }
