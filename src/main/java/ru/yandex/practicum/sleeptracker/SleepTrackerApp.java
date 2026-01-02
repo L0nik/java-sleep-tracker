@@ -28,6 +28,7 @@ public class SleepTrackerApp {
         functions.add(AnalyticalFunctions::findMaxSession);
         functions.add(AnalyticalFunctions::findAverageSession);
         functions.add(AnalyticalFunctions::countBadSleepSessions);
+        functions.add(AnalyticalFunctions::countNightsWithoutSleep);
 
         functions.stream()
                 .map(function -> function.apply(sleepLog))
