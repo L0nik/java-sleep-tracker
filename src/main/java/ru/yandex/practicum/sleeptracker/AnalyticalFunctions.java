@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class AnalyticalFunctions {
 
@@ -60,7 +62,6 @@ public class AnalyticalFunctions {
                 sleepLog.getFirst().getStartOfSession().toLocalDate(),
                 sleepLog.getLast().getEndOfSession().toLocalDate()
         ).getDays();
-        System.out.println(countAllNights);
         int countNightsSlept = sleepLog.stream()
                 .reduce(
                         0,
@@ -74,9 +75,59 @@ public class AnalyticalFunctions {
                         },
                         Integer::sum
                 );
-        System.out.println(countNightsSlept);
         int result = countAllNights - countNightsSlept;
 
+        return new SleepAnalysisResult<>(description, result);
+    }
+
+    public static SleepAnalysisResult<Chronotype> calculateUserChronotype(List<SleepingSession> sleepLog) {
+        String description = "Хронотип пользователя";
+        List<SleepingSession> nightSleepSessions = sleepLog.stream()
+                .filter(
+                        (sleepingSession) -> {
+                            LocalDateTime start = sleepingSession.getStartOfSession();
+                            LocalDateTime end = sleepingSession.getEndOfSession();
+                            if (start.getDayOfMonth() == end.getDayOfMonth())
+                                return start.getHour() <= 6;
+                            else
+                                return true;
+                        }
+                ).toList();
+        BiPredicate<LocalDateTime, LocalDateTime> isLarkSession = (start, end) ->
+            start.getDayOfMonth() != end.getDayOfMonth() && start.getHour() < 22 && end.getHour() < 7;
+
+        BiPredicate<LocalDateTime, LocalDateTime> isOwlSession = (start, end) -> {
+            if (start.getDayOfMonth() != end.getDayOfMonth())
+                return start.getHour() >= 23 && end.getHour() > 9;
+            else
+                return end.getHour() >= 9;
+        };
+        BiPredicate<LocalDateTime, LocalDateTime> isPigeonSession = (start, end) ->
+                !isLarkSession.test(start, end) && !isOwlSession.test(start, end);
+
+        long countLarkSessions = nightSleepSessions.stream()
+                .filter(sleepingSession -> isLarkSession.test(
+                        sleepingSession.getEndOfSession(),
+                        sleepingSession.getEndOfSession()
+                )).count();
+        long countOwlSessions = nightSleepSessions.stream()
+                .filter(sleepingSession -> isOwlSession.test(
+                        sleepingSession.getEndOfSession(),
+                        sleepingSession.getEndOfSession()
+                )).count();
+        long countPigeonSessions = nightSleepSessions.stream()
+                .filter(sleepingSession -> isPigeonSession.test(
+                        sleepingSession.getEndOfSession(),
+                        sleepingSession.getEndOfSession()
+                )).count();
+
+        Chronotype result;
+        if (countOwlSessions > countLarkSessions && countOwlSessions > countPigeonSessions)
+            result = Chronotype.OWL;
+        else if (countLarkSessions > countOwlSessions && countLarkSessions > countPigeonSessions)
+            result = Chronotype.LARK;
+        else
+            result = Chronotype.PIGEON;
         return new SleepAnalysisResult<>(description, result);
     }
 }
