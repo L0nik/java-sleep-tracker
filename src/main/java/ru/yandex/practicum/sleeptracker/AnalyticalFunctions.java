@@ -5,7 +5,6 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 public class AnalyticalFunctions {
 
@@ -37,6 +36,8 @@ public class AnalyticalFunctions {
 
     public static SleepAnalysisResult<Long> findAverageSession(List<SleepingSession> sleepLog) {
         String description = "Средняя продолжительность сессии (в минутах)";
+        if (sleepLog.isEmpty())
+            return new SleepAnalysisResult<>(description, 0L);
         Long sum = sleepLog.stream()
                 .map(SleepingSession::getSleepDurationInMinutes)
                 .reduce(0L, Long::sum);
