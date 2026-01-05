@@ -11,9 +11,9 @@ import java.util.List;
 
 public class SleepTrackerAppTest {
 
-    private final static List<SleepingSession> emptySleepLog = new ArrayList<>();
-    private final static List<SleepingSession> sleepLog = new ArrayList<>();
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+    private static final List<SleepingSession> emptySleepLog = new ArrayList<>();
+    private static final List<SleepingSession> sleepLog = new ArrayList<>();
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     @BeforeAll
     public static void beforeAll() {
