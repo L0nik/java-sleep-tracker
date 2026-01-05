@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class SleepTrackerAppTest {
 
     private final static List<SleepingSession> emptySleepLog = new ArrayList<>();
     private final static List<SleepingSession> sleepLog = new ArrayList<>();
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     @BeforeAll
     public static void beforeAll() {
@@ -123,6 +125,163 @@ public class SleepTrackerAppTest {
                 1L
         );
         SleepAnalysisResult<Long> actual = AnalyticalFunctions.countBadSleepSessions(sleepLog);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void countNightsWithoutSleepNoSessionsTest() {
+        assertThrows(EmptySleepLogException.class, () -> AnalyticalFunctions.countNightsWithoutSleep(emptySleepLog));
+    }
+
+    @Test
+    public void countNightsWithoutSleepMonthChangeTest() {
+        ArrayList<SleepingSession> sleepLog = new ArrayList<>();
+        SleepingSession session1 = new SleepingSession(
+                LocalDateTime.of(2025, 12, 31, 23, 0, 0),
+                LocalDateTime.of(2026, 1, 1, 7, 0, 0),
+                SleepQuality.NORMAL
+        );
+        sleepLog.add(session1);
+        SleepAnalysisResult<Integer> expected = new SleepAnalysisResult<>(
+                "Количество бессонных ночей за период с " +
+                        sleepLog.getFirst().getStartOfSession().format(formatter) +
+                        " по " +
+                        sleepLog.getLast().getEndOfSession().format(formatter),
+                0
+        );
+        SleepAnalysisResult<Integer> actual = AnalyticalFunctions.countNightsWithoutSleep(sleepLog);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void countNightsWithoutSleepDoesNotCountSleepDuringDayTest() {
+        ArrayList<SleepingSession> sleepLog = new ArrayList<>();
+        SleepingSession session1 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 12, 0, 0),
+                LocalDateTime.of(2026, 1, 1, 13, 0, 0),
+                SleepQuality.NORMAL
+        );
+        SleepingSession session2 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 23, 0, 0),
+                LocalDateTime.of(2026, 1, 1, 7, 0, 0),
+                SleepQuality.NORMAL
+        );
+        sleepLog.add(session1);
+        sleepLog.add(session2);
+        SleepAnalysisResult<Integer> expected = new SleepAnalysisResult<>(
+                "Количество бессонных ночей за период с " +
+                        sleepLog.getFirst().getStartOfSession().format(formatter) +
+                        " по " +
+                        sleepLog.getLast().getEndOfSession().format(formatter),
+                0
+        );
+        SleepAnalysisResult<Integer> actual = AnalyticalFunctions.countNightsWithoutSleep(sleepLog);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void countNightsWithoutSleepLateSleepTest() {
+        ArrayList<SleepingSession> sleepLog = new ArrayList<>();
+        SleepingSession session1 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 2, 0, 0),
+                LocalDateTime.of(2026, 1, 1, 9, 0, 0),
+                SleepQuality.NORMAL
+        );
+        sleepLog.add(session1);
+        SleepAnalysisResult<Integer> expected = new SleepAnalysisResult<>(
+                "Количество бессонных ночей за период с " +
+                        sleepLog.getFirst().getStartOfSession().format(formatter) +
+                        " по " +
+                        sleepLog.getLast().getEndOfSession().format(formatter),
+                0
+        );
+        SleepAnalysisResult<Integer> actual = AnalyticalFunctions.countNightsWithoutSleep(sleepLog);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calculateUserChronotypeNoSessionsTest() {
+        assertThrows(EmptySleepLogException.class, () -> AnalyticalFunctions.calculateUserChronotype(emptySleepLog));
+    }
+
+    @Test
+    public void calculateUserChronotypeOwlTest() {
+        ArrayList<SleepingSession> sleepLog = new ArrayList<>();
+        SleepingSession session1 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 1, 0, 0),
+                LocalDateTime.of(2026, 1, 1, 10, 0, 0),
+                SleepQuality.NORMAL
+        );
+        SleepingSession session2 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 23, 0, 0),
+                LocalDateTime.of(2026, 1, 2, 10, 0, 0),
+                SleepQuality.NORMAL
+        );
+        SleepingSession session3 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 2, 21, 0, 0),
+                LocalDateTime.of(2026, 1, 3, 6, 0, 0),
+                SleepQuality.NORMAL
+        );
+        sleepLog.add(session1);
+        sleepLog.add(session2);
+        sleepLog.add(session3);
+        SleepAnalysisResult<Chronotype> expected = new SleepAnalysisResult<>(
+                "Хронотип пользователя",
+                Chronotype.OWL
+        );
+        SleepAnalysisResult<Chronotype> actual = AnalyticalFunctions.calculateUserChronotype(sleepLog);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calculateUserChronotypeLarkTest() {
+        ArrayList<SleepingSession> sleepLog = new ArrayList<>();
+        SleepingSession session1 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 20, 0, 0),
+                LocalDateTime.of(2026, 1, 2, 5, 0, 0),
+                SleepQuality.NORMAL
+        );
+        SleepingSession session2 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 23, 0, 0),
+                LocalDateTime.of(2026, 1, 2, 9, 0, 0),
+                SleepQuality.NORMAL
+        );
+        SleepingSession session3 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 2, 21, 0, 0),
+                LocalDateTime.of(2026, 1, 3, 6, 0, 0),
+                SleepQuality.NORMAL
+        );
+        sleepLog.add(session1);
+        sleepLog.add(session2);
+        sleepLog.add(session3);
+        SleepAnalysisResult<Chronotype> expected = new SleepAnalysisResult<>(
+                "Хронотип пользователя",
+                Chronotype.LARK
+        );
+        SleepAnalysisResult<Chronotype> actual = AnalyticalFunctions.calculateUserChronotype(sleepLog);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calculateUserChronotypeEqualLarkAndOwlSessionsTest() {
+        ArrayList<SleepingSession> sleepLog = new ArrayList<>();
+        SleepingSession session1 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 1, 0, 0),
+                LocalDateTime.of(2026, 1, 1, 10, 0, 0),
+                SleepQuality.NORMAL
+        );
+        SleepingSession session2 = new SleepingSession(
+                LocalDateTime.of(2026, 1, 1, 22, 0, 0),
+                LocalDateTime.of(2026, 1, 2, 6, 0, 0),
+                SleepQuality.NORMAL
+        );
+        sleepLog.add(session1);
+        sleepLog.add(session2);
+        SleepAnalysisResult<Chronotype> expected = new SleepAnalysisResult<>(
+                "Хронотип пользователя",
+                Chronotype.PIGEON
+        );
+        SleepAnalysisResult<Chronotype> actual = AnalyticalFunctions.calculateUserChronotype(sleepLog);
         assertEquals(expected, actual);
     }
 }

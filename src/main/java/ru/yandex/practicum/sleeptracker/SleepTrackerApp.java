@@ -31,9 +31,13 @@ public class SleepTrackerApp {
         functions.add(AnalyticalFunctions::countNightsWithoutSleep);
         functions.add(AnalyticalFunctions::calculateUserChronotype);
 
-        functions.stream()
-                .map(function -> function.apply(sleepLog))
-                .toList().forEach(System.out::println);
+        try {
+            functions.stream()
+                    .map(function -> function.apply(sleepLog))
+                    .toList().forEach(System.out::println);
+        } catch (EmptySleepLogException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
     private static void loadSleepLog(String path) {

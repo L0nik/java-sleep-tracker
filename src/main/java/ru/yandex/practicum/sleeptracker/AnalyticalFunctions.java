@@ -53,7 +53,11 @@ public class AnalyticalFunctions {
         return new SleepAnalysisResult<>(description, result);
     }
 
-    public static SleepAnalysisResult<Integer> countNightsWithoutSleep(List<SleepingSession> sleepLog) {
+    public static SleepAnalysisResult<Integer> countNightsWithoutSleep(List<SleepingSession> sleepLog)
+            throws EmptySleepLogException {
+        if (sleepLog.isEmpty()) {
+            throw new EmptySleepLogException("Лог сна не должен быть пустым!");
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         String description = "Количество бессонных ночей за период с " +
                 sleepLog.getFirst().getStartOfSession().format(formatter) +
@@ -63,6 +67,9 @@ public class AnalyticalFunctions {
                 sleepLog.getFirst().getStartOfSession().toLocalDate(),
                 sleepLog.getLast().getEndOfSession().toLocalDate()
         ).getDays();
+        if (sleepLog.getFirst().getStartOfSession().getHour() < 12) {
+            countAllNights += 1;
+        }
         int countNightsSlept = sleepLog.stream()
                 .reduce(
                         0,
@@ -81,7 +88,11 @@ public class AnalyticalFunctions {
         return new SleepAnalysisResult<>(description, result);
     }
 
-    public static SleepAnalysisResult<Chronotype> calculateUserChronotype(List<SleepingSession> sleepLog) {
+    public static SleepAnalysisResult<Chronotype> calculateUserChronotype(List<SleepingSession> sleepLog)
+            throws EmptySleepLogException {
+        if (sleepLog.isEmpty()) {
+            throw new EmptySleepLogException("Лог сна не должен быть пустым!");
+        }
         String description = "Хронотип пользователя";
         List<SleepingSession> nightSleepSessions = sleepLog.stream()
                 .filter(
@@ -108,17 +119,17 @@ public class AnalyticalFunctions {
 
         long countLarkSessions = nightSleepSessions.stream()
                 .filter(sleepingSession -> isLarkSession.test(
-                        sleepingSession.getEndOfSession(),
+                        sleepingSession.getStartOfSession(),
                         sleepingSession.getEndOfSession()
                 )).count();
         long countOwlSessions = nightSleepSessions.stream()
                 .filter(sleepingSession -> isOwlSession.test(
-                        sleepingSession.getEndOfSession(),
+                        sleepingSession.getStartOfSession(),
                         sleepingSession.getEndOfSession()
                 )).count();
         long countPigeonSessions = nightSleepSessions.stream()
                 .filter(sleepingSession -> isPigeonSession.test(
-                        sleepingSession.getEndOfSession(),
+                        sleepingSession.getStartOfSession(),
                         sleepingSession.getEndOfSession()
                 )).count();
 
