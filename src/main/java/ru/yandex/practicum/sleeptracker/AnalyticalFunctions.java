@@ -41,7 +41,7 @@ public class AnalyticalFunctions {
         Long sum = sleepLog.stream()
                 .map(SleepingSession::getSleepDurationInMinutes)
                 .reduce(0L, Long::sum);
-        Long result = sum/sleepLog.size();
+        Long result = sum / sleepLog.size();
         return new SleepAnalysisResult<>(description, result);
     }
 
