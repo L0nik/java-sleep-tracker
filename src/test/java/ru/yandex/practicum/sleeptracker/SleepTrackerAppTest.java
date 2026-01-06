@@ -2,6 +2,8 @@ package ru.yandex.practicum.sleeptracker;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.sleeptracker.functions.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
@@ -33,7 +35,7 @@ public class SleepTrackerAppTest {
 
     @Test
     public void countSessionsNoSessionsTest() {
-        SleepAnalysisResult<Integer> actual = AnalyticalFunctions.countSessions(emptySleepLog);
+        SleepAnalysisResult<Integer> actual = new CountSessionsFunction().apply(emptySleepLog);
         SleepAnalysisResult<Integer> expected = new SleepAnalysisResult<>("Всего сессий сна за период", 0);
         assertEquals(expected, actual);
     }
@@ -44,7 +46,7 @@ public class SleepTrackerAppTest {
                 "Всего сессий сна за период",
                 2
         );
-        SleepAnalysisResult<Integer> actual = AnalyticalFunctions.countSessions(sleepLog);
+        SleepAnalysisResult<Integer> actual = new CountSessionsFunction().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
@@ -54,7 +56,7 @@ public class SleepTrackerAppTest {
                 "Минимальная продолжительность сессии (в минутах)",
                 0L
         );
-        SleepAnalysisResult<Long> actual = AnalyticalFunctions.findMinSession(emptySleepLog);
+        SleepAnalysisResult<Long> actual = new FindMinSessionFunction().apply(emptySleepLog);
         assertEquals(expected, actual);
     }
 
@@ -64,7 +66,7 @@ public class SleepTrackerAppTest {
                 "Минимальная продолжительность сессии (в минутах)",
                 60L
         );
-        SleepAnalysisResult<Long> actual = AnalyticalFunctions.findMinSession(sleepLog);
+        SleepAnalysisResult<Long> actual = new FindMinSessionFunction().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
@@ -74,7 +76,7 @@ public class SleepTrackerAppTest {
                 "Максимальная продолжительность сессии (в минутах)",
                 0L
         );
-        SleepAnalysisResult<Long> actual = AnalyticalFunctions.findMaxSession(emptySleepLog);
+        SleepAnalysisResult<Long> actual = new FindMaxSessionFunction().apply(emptySleepLog);
         assertEquals(expected, actual);
     }
 
@@ -84,7 +86,7 @@ public class SleepTrackerAppTest {
                 "Максимальная продолжительность сессии (в минутах)",
                 120L
         );
-        SleepAnalysisResult<Long> actual = AnalyticalFunctions.findMaxSession(sleepLog);
+        SleepAnalysisResult<Long> actual = new FindMaxSessionFunction().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
@@ -94,7 +96,7 @@ public class SleepTrackerAppTest {
                 "Средняя продолжительность сессии (в минутах)",
                 0L
         );
-        SleepAnalysisResult<Long> actual = AnalyticalFunctions.findAverageSession(emptySleepLog);
+        SleepAnalysisResult<Long> actual = new FindAverageSessionFunction().apply(emptySleepLog);
         assertEquals(expected, actual);
     }
 
@@ -104,7 +106,7 @@ public class SleepTrackerAppTest {
                 "Средняя продолжительность сессии (в минутах)",
                 90L
         );
-        SleepAnalysisResult<Long> actual = AnalyticalFunctions.findAverageSession(sleepLog);
+        SleepAnalysisResult<Long> actual = new FindAverageSessionFunction().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
@@ -114,7 +116,7 @@ public class SleepTrackerAppTest {
                 "Количество сессий с плохим качество сна",
                 0L
         );
-        SleepAnalysisResult<Long> actual = AnalyticalFunctions.countBadSleepSessions(emptySleepLog);
+        SleepAnalysisResult<Long> actual = new CountBadSleepSessionsFunction().apply(emptySleepLog);
         assertEquals(expected, actual);
     }
 
@@ -124,13 +126,13 @@ public class SleepTrackerAppTest {
                 "Количество сессий с плохим качество сна",
                 1L
         );
-        SleepAnalysisResult<Long> actual = AnalyticalFunctions.countBadSleepSessions(sleepLog);
+        SleepAnalysisResult<Long> actual = new CountBadSleepSessionsFunction().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
     @Test
     public void countNightsWithoutSleepNoSessionsTest() {
-        assertThrows(EmptySleepLogException.class, () -> AnalyticalFunctions.countNightsWithoutSleep(emptySleepLog));
+        assertThrows(EmptySleepLogException.class, () -> new CountNightsWithoutSleep().apply(emptySleepLog));
     }
 
     @Test
@@ -149,7 +151,7 @@ public class SleepTrackerAppTest {
                         sleepLog.getLast().getEndOfSession().format(formatter),
                 0
         );
-        SleepAnalysisResult<Integer> actual = AnalyticalFunctions.countNightsWithoutSleep(sleepLog);
+        SleepAnalysisResult<Integer> actual = new CountNightsWithoutSleep().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
@@ -175,7 +177,7 @@ public class SleepTrackerAppTest {
                         sleepLog.getLast().getEndOfSession().format(formatter),
                 0
         );
-        SleepAnalysisResult<Integer> actual = AnalyticalFunctions.countNightsWithoutSleep(sleepLog);
+        SleepAnalysisResult<Integer> actual = new CountNightsWithoutSleep().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
@@ -195,13 +197,13 @@ public class SleepTrackerAppTest {
                         sleepLog.getLast().getEndOfSession().format(formatter),
                 0
         );
-        SleepAnalysisResult<Integer> actual = AnalyticalFunctions.countNightsWithoutSleep(sleepLog);
+        SleepAnalysisResult<Integer> actual = new CountNightsWithoutSleep().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
     @Test
     public void calculateUserChronotypeNoSessionsTest() {
-        assertThrows(EmptySleepLogException.class, () -> AnalyticalFunctions.calculateUserChronotype(emptySleepLog));
+        assertThrows(EmptySleepLogException.class, () -> new CalculateUserChronotypeFunction().apply(emptySleepLog));
     }
 
     @Test
@@ -229,7 +231,7 @@ public class SleepTrackerAppTest {
                 "Хронотип пользователя",
                 Chronotype.OWL
         );
-        SleepAnalysisResult<Chronotype> actual = AnalyticalFunctions.calculateUserChronotype(sleepLog);
+        SleepAnalysisResult<Chronotype> actual = new CalculateUserChronotypeFunction().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
@@ -258,7 +260,7 @@ public class SleepTrackerAppTest {
                 "Хронотип пользователя",
                 Chronotype.LARK
         );
-        SleepAnalysisResult<Chronotype> actual = AnalyticalFunctions.calculateUserChronotype(sleepLog);
+        SleepAnalysisResult<Chronotype> actual = new CalculateUserChronotypeFunction().apply(sleepLog);
         assertEquals(expected, actual);
     }
 
@@ -281,7 +283,7 @@ public class SleepTrackerAppTest {
                 "Хронотип пользователя",
                 Chronotype.PIGEON
         );
-        SleepAnalysisResult<Chronotype> actual = AnalyticalFunctions.calculateUserChronotype(sleepLog);
+        SleepAnalysisResult<Chronotype> actual = new CalculateUserChronotypeFunction().apply(sleepLog);
         assertEquals(expected, actual);
     }
 }

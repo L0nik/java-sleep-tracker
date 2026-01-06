@@ -1,5 +1,7 @@
 package ru.yandex.practicum.sleeptracker;
 
+import ru.yandex.practicum.sleeptracker.functions.*;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,7 +15,8 @@ import java.util.function.Function;
 public class SleepTrackerApp {
 
     private static final ArrayList<SleepingSession> sleepLog = new ArrayList<>();
-    private static final ArrayList<Function<ArrayList<SleepingSession>, SleepAnalysisResult>> functions = new ArrayList<>();
+    private static final ArrayList<Function> functions = new ArrayList<>();
+
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -23,13 +26,13 @@ public class SleepTrackerApp {
         String path = args[0];
         loadSleepLog(path);
 
-        functions.add(AnalyticalFunctions::countSessions);
-        functions.add(AnalyticalFunctions::findMinSession);
-        functions.add(AnalyticalFunctions::findMaxSession);
-        functions.add(AnalyticalFunctions::findAverageSession);
-        functions.add(AnalyticalFunctions::countBadSleepSessions);
-        functions.add(AnalyticalFunctions::countNightsWithoutSleep);
-        functions.add(AnalyticalFunctions::calculateUserChronotype);
+        functions.add(new CountSessionsFunction());
+        functions.add(new FindMinSessionFunction());
+        functions.add(new FindMaxSessionFunction());
+        functions.add(new FindAverageSessionFunction());
+        functions.add(new CountBadSleepSessionsFunction());
+        functions.add(new CountNightsWithoutSleep());
+        functions.add(new CalculateUserChronotypeFunction());
 
         try {
             functions.stream()
