@@ -6,11 +6,18 @@ import ru.yandex.practicum.sleeptracker.SleepAnalysisResult;
 import ru.yandex.practicum.sleeptracker.SleepingSession;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class CalculateUserChronotypeFunction implements Function<List<SleepingSession>, SleepAnalysisResult<Chronotype>> {
+
+    private static final LocalTime lateTimeToSleep = LocalTime.of(23, 0, 0);
+    private static final LocalTime lateTimeToWakeUp = LocalTime.of(9, 0, 0);
+    private static final LocalTime earlyTimeToSleep = LocalTime.of(22, 0, 0);
+    private static final LocalTime earlyTimeToWakeUp = LocalTime.of(7, 0, 0);
+
     @Override
     public SleepAnalysisResult<Chronotype> apply(List<SleepingSession> sleepLog) throws EmptySleepLogException {
         if (sleepLog.isEmpty()) {
@@ -29,13 +36,14 @@ public class CalculateUserChronotypeFunction implements Function<List<SleepingSe
                         }
                 ).toList();
         BiPredicate<LocalDateTime, LocalDateTime> isLarkSession = (start, end) ->
-                start.getDayOfMonth() != end.getDayOfMonth() && start.getHour() < 22 && end.getHour() < 7;
+                start.getDayOfMonth() != end.getDayOfMonth() && start.toLocalTime().isBefore(earlyTimeToSleep) &&
+                        end.toLocalTime().isBefore(earlyTimeToWakeUp);
 
         BiPredicate<LocalDateTime, LocalDateTime> isOwlSession = (start, end) -> {
             if (start.getDayOfMonth() != end.getDayOfMonth())
-                return start.getHour() >= 23 && end.getHour() > 9;
+                return start.toLocalTime().isAfter(lateTimeToSleep) && end.toLocalTime().isAfter(lateTimeToWakeUp);
             else
-                return end.getHour() >= 9;
+                return end.toLocalTime().isAfter(lateTimeToWakeUp);
         };
         BiPredicate<LocalDateTime, LocalDateTime> isPigeonSession = (start, end) ->
                 !isLarkSession.test(start, end) && !isOwlSession.test(start, end);
