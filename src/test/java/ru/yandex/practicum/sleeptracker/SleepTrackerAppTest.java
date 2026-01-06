@@ -215,7 +215,7 @@ public class SleepTrackerAppTest {
                 SleepQuality.NORMAL
         );
         SleepingSession session2 = new SleepingSession(
-                LocalDateTime.of(2026, 1, 1, 23, 0, 0),
+                LocalDateTime.of(2026, 1, 1, 23, 30, 0),
                 LocalDateTime.of(2026, 1, 2, 10, 0, 0),
                 SleepQuality.NORMAL
         );
